@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Switch, Route, Redirect } from "react-router-dom";
-import axios from "axios";
 
 // Components
 import Sidebar from "./Sidebar";
@@ -8,43 +7,13 @@ import Loading from "./Loading";
 import AuthorsList from "./AuthorsList";
 import AuthorDetail from "./AuthorDetail";
 import BookList from "./BookList";
+import {connect} from "react-redux";
 
-const instance = axios.create({
-  baseURL: "https://the-index-api.herokuapp.com"
-});
 
-const App = () => {
-  const [authors, setAuthors] = useState([]);
-  const [books, setBooks] = useState([]);
-  const [loading, setLoading] = useState([]);
-
-  useEffect(() => {
-    const fetchAllAuthors = async () => {
-      const res = await instance.get("/api/authors/");
-      return res.data;
-    };
-
-    const fetchAllBooks = async () => {
-      const res = await instance.get("/api/books/");
-      return res.data;
-    };
-    const fetchAll = async () => {
-      try {
-        const authorsData = await fetchAllAuthors();
-        const booksData = await fetchAllBooks();
-
-        setAuthors(authorsData);
-        setBooks(booksData);
-        setLoading(false);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    fetchAll();
-  }, []);
+const App = (props) => {
 
   const getView = () => {
-    if (loading) {
+    if (props.loading) {
       return <Loading />;
     } else {
       return (
@@ -54,10 +23,10 @@ const App = () => {
             <AuthorDetail />
           </Route>
           <Route path="/authors/">
-            <AuthorsList authors={authors} />
+            <AuthorsList />
           </Route>
           <Route path="/books/:bookColor?">
-            <BookList books={books} />
+            <BookList />
           </Route>
         </Switch>
       );
@@ -75,5 +44,11 @@ const App = () => {
     </div>
   );
 };
+const mapStateToProps = state => {
+    return {
+        authors: state.authors.authors,
+        loading: !(state.authors.authors.length && state.books.books.length)
+    }
+};
 
-export default App;
+export default connect(mapStateToProps)(App);

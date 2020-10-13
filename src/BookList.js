@@ -6,6 +6,7 @@ import BookTable from "./BookTable";
 
 // Route
 import { useParams } from "react-router-dom";
+import {connect} from "react-redux";
 
 const BookList = props => {
   const [query, setQuery] = useState("");
@@ -31,5 +32,10 @@ const BookList = props => {
     </div>
   );
 };
+const mapStateToProps = state => {
+  return {
+    books: state.books.books,
+  }
+};
 
-export default BookList;
+export default connect(mapStateToProps)(BookList);
